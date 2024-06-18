@@ -42,7 +42,8 @@ const getMessages = async(req, res)=> {
     try {
        const  {id:userToChatId} = req.params;
        const senderId = req.user._id;
-
+       
+        console.log(senderId, userToChatId)
        const conversation = await Conversation.findOne({
         participants:{$all:[senderId, userToChatId]},
        }).populate("messages");
@@ -55,7 +56,7 @@ const getMessages = async(req, res)=> {
        res.status(200).json(messages);
     }
         catch (error) {
-            console.log("Error in sendMessage controller: ", error.message)
+            console.log("Error in GETMessage controller: ", error.message)
             return res.status(500).json({message:"Internal Server Error"})
         }
     }
