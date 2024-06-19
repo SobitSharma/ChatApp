@@ -1,52 +1,89 @@
 import React, { useEffect, useState } from "react";
 import { useUserContext } from "../Context/UserContext";
-import {useNavigate} from "react-router-dom"
 
 const ChatRoom = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [newMessage, setNewMessage] = useState('');
   const [previousMessages, setPreviousMessages] = useState([]);
-  const [messageSent, setMessageSent] = useState(false);  // New state for triggering updates
+  const [messageSent, setMessageSent] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { sideBarUsers } = useUserContext();
-  const navigate = useNavigate()
+
+  const getPreviousMessages = async () => {
+    if (selectedUser) {
+      setLoading(true);
+      try {
+        const response = await fetch(`http://localhost:8000/api/messages/${selectedUser._id}`, {
+          method: 'GET',
+          credentials: 'include'
+        });
+        const result = await response.json(); 
+        setPreviousMessages(previous => {
+          const exists = previous.find(item => item[selectedUser.fullname]);
+          if (!exists) {
+            return [...previous, { [selectedUser.fullname]: result }];
+          }
+          return previous.map(item =>
+            item[selectedUser.fullname] ? { [selectedUser.fullname]: result } : item
+          );
+        });
+      } catch (error) {
+        console.error('Error fetching messages:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+  };
 
   useEffect(() => {
     if (selectedUser) {
-      fetch(`http://localhost:8000/api/messages/${selectedUser._id}`, {
-        method: 'GET',
-        credentials: 'include'
-      })
-        .then((response) => response.json())
-        .then((result) => setPreviousMessages(result));
+      getPreviousMessages();
     }
-  }, [selectedUser, messageSent]);  // Add messageSent to the dependency array
+  }, [selectedUser, messageSent]);
 
   const handleUserClick = (user) => {
     setSelectedUser(user);
+    setMessageSent(prev => !prev); // Trigger messageSent to fetch messages
   };
- 
 
-  const handleSendingMessage = () => {
-    if(newMessage){
-      fetch(`http://localhost:8000/api/messages/send/${selectedUser._id}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ message: newMessage }),
-        credentials: 'include'
-      })
-        .then((response) => response.json())
-        .then((result) => {
-          console.log(result);
-          setNewMessage('');
-          setMessageSent(!messageSent);  // Toggle messageSent state to trigger useEffect
-        })
-        .catch((error) => console.error(error));
+  const handleSendingMessage = async () => {
+    if (newMessage) {
+      try {
+        const response = await fetch(`http://localhost:8000/api/messages/send/${selectedUser._id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ message: newMessage }),
+          credentials: 'include'
+        });
+        const result = await response.json();
+        console.log(result);
+        setNewMessage('');
+        await getPreviousMessages(); // Fetch messages after sending
+      } catch (error) {
+        console.error('Error sending message:', error);
+      }
+    } else {
+      alert('Message cannot be empty');
     }
-    else{
-      alert('Message cannot be empty')
+  };
+
+  const renderMessages = () => {
+    const messagesObj = previousMessages.find(item => item[selectedUser.fullname]);
+    if (messagesObj) {
+      const messages = messagesObj[selectedUser.fullname];
+      return (
+        <ul id="messagelist" className="bg-white text-black text-xl p-2">
+          {messages.map((message) => (
+            <li key={message._id} className="bg-green-400 text-red-500 mb-1">
+              {message.message}
+            </li>
+          ))}
+        </ul>
+      );
     }
+    return null;
   };
 
   return (
@@ -68,9 +105,7 @@ const ChatRoom = () => {
               <div>
                 <h3 className="text-sm font-semibold">{user.fullname}</h3>
                 <span
-                  className={`text-xs ${
-                    user.online ? "text-green-500" : "text-gray-500"
-                  }`}
+                  className={`text-xs ${user.online ? "text-green-500" : "text-gray-500"}`}
                 >
                   {user.online ? "Online" : "Offline"}
                 </span>
@@ -84,13 +119,11 @@ const ChatRoom = () => {
           <div>
             <h2 className="text-lg font-bold mb-4">Send Message to {selectedUser.fullname}</h2>
             <div>
-            {
-              previousMessages.length>1 ? <ul id="messagelist" className="bg-white text-black text-xl p-2">
-              {previousMessages.map((message) => (
-                <li key={message._id} className="bg-green-400 text-red-500 mb-1">{message.message}</li>
-              ))}
-            </ul> : ''
-            }
+              {loading ? (
+                <div>Loading messages...</div>
+              ) : (
+                renderMessages()
+              )}
             </div>
             <div className="border p-4 rounded">
               <input

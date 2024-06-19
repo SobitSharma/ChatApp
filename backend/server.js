@@ -14,7 +14,7 @@ app.use(cors({origin:['http://localhost:5173'], credentials:true}))
 
 const PORT = process.env.PORT || 3000
 
-app.use("/api/auth", authrouter)
+app.use("/api/auth", authrouter)                    
 app.use("/api/messages", router)
 app.use("/api/users",userrouter)
 
