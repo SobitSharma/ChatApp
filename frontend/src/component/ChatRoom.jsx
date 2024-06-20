@@ -30,7 +30,7 @@ const ChatRoom = () => {
   const HandleSendMessages = (e) => {
     e.preventDefault();
     if (newMessage) {
-      const messageData = { message: newMessage, senderId: userLogin._id, _id: Date.now().toString() };
+      const messageData = { message: newMessage, senderId:selectUser._id, _id: Date.now().toString() };
       setpreviousmessages((previous) => {
         const userMessages = previous[selectUser.fullname] || [];
         return {
@@ -38,7 +38,8 @@ const ChatRoom = () => {
           [selectUser.fullname]: [...userMessages, messageData],
         };
       });
-
+      console.log(selectUser)
+      console.log(messageData)
       fetch(`http://localhost:8000/api/messages/send/${selectUser._id}`, {
         method: "POST",
         headers: {
@@ -141,12 +142,11 @@ const ChatRoom = () => {
             </div>
             <div className="flex flex-col flex-grow bg-white p-4 overflow-y-auto">
               <ul className="space-y-2">
-                {loading
-                  ? previousmessages[selectUser.fullname].map((message) =>
-                    message.senderId == selectUser._id ? (
+                {loading 
+                  ? previousmessages[selectUser.fullname].map((message) =>  
+                    (message.senderId == selectUser._id) ? (
                       <li
                         className={`bg-gray-200 p-2 rounded-lg self-end max-w-xs flex justify-end ${message.shouldshake?"shake":''}`}
-                        // style={message.shouldshake ? "shake" : ""}
                         key={message._id}
                       >
                         {message.message}
