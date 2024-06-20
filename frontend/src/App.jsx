@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom"
 import { UserContext } from "./Context/UserContext"
 import { useContext, useState } from "react"
+import { SocketContextProvider } from "./Context/SocketContext"
 
 function App() {
   const [userLogin, setUserLogin] = useState(false)
@@ -21,7 +22,9 @@ function App() {
 
   return (
     <UserContext.Provider value={{userLogin, UserInfo, changeStatus, ChangeUserInfo, sideBarUsers, updateUsers}}>
-      <Outlet/>
+      <SocketContextProvider>
+        <Outlet/>  
+      </SocketContextProvider>
     </UserContext.Provider> 
   )
 }

@@ -20,7 +20,6 @@ const LoginForm = () => {
   const onSubmit = (e) => {
     e.preventDefault();
     const dataToSend = {username, password};
-    console.log(dataToSend)
     fetch("http://localhost:8000/api/auth/login", {
       method:'POST',
       headers:{
@@ -30,9 +29,9 @@ const LoginForm = () => {
       credentials:'include'
     }).then((response)=> {
       if(response.ok){
-        changeStatus(true);
         const data = response.json()
         data.then((result)=> {
+          changeStatus(true);
           ChangeUserInfo(result);
           userForSideBar();
           navigate('/room')
