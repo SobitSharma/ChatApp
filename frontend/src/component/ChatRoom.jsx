@@ -25,6 +25,8 @@ const ChatRoom = () => {
           setloading(true);
         });
     }
+    console.log(selectUser)
+    console.log(previousmessages)
   }, [selectUser]);
 
   const HandleSendMessages = (e) => {
@@ -108,7 +110,7 @@ const ChatRoom = () => {
                 className="rounded-full h-12 w-12"
               />
               <div className="ml-4">
-                <div className="text-lg font-semibold">{user.fullname}</div>
+                <div className="text-lg font-semibold">{user.username}</div>
                 <div
                   className={`text-sm ${onlineusers.includes(user._id) ? 'text-green-500' : 'text-red-500'
                     }`}
@@ -145,15 +147,14 @@ const ChatRoom = () => {
                   ? previousmessages[selectUser.fullname].map((message) =>
                     message.senderId == selectUser._id ? (
                       <li
-                        className={`bg-gray-200 p-2 rounded-lg self-end max-w-xs flex justify-end ${message.shouldshake?"shake":''}`}
-                        // style={message.shouldshake ? "shake" : ""}
-                        key={message._id}
+                        className={`bg-gray-200 p-2 rounded-lg self-end max-w-xs flex justify-start${message.shouldshake?"shake":''}`}
+                        key={message._id} 
                       >
                         {message.message}
                       </li>
                     ) : (
                       <li
-                        className={`bg-blue-500 text-white p-2 rounded-lg max-w-xs ${message.shouldshake?"shake":''}`}
+                        className={`bg-blue-500 text-white p-2 rounded-lg max-w-xs flex justify-end ml-40${message.shouldshake?"shake":''}`}
                         key={message._id}
                       >
                         {message.message}

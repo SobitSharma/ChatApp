@@ -42,6 +42,26 @@ const signup = async(req, res)=> {
                 error:"Passwords donnot match"
             })
         }
+
+        const characters = /[A-Z]/g;
+        const Numbers = /[1-9]/g;
+        const specialchar = /[!@#$%^&*(){};:'<>,.]/g;
+
+        if(password.length < 8){
+            return res.status(400).json({
+                error:"Password length should be greater than 8"
+            })
+        }
+
+        if(!(password.match(characters)) || !(password.match(Numbers)) || !(password.match(specialchar))){
+            console.log(password)
+            console.log(password.match(characters),password.match(Numbers),password.match(specialchar))
+            return res.status(400).json({
+                error:
+                "Password is not Valid Rules for password are: Atleast one CapitalCharacter, Number, SpecialCharacter(allowed special chars [!@#$%^&*(){}[];:'<>,.+])"
+            })
+        }
+
         const user = await User.findOne({username});
         if(user){
             return res.status(400).json({error:"Username already exists"})

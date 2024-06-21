@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const SignupForm = () => {
   const [fullname, setFullname] = useState('');
@@ -6,6 +7,7 @@ const SignupForm = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [gender, setGender] = useState('');
+  const navigate = useNavigate()
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -24,9 +26,11 @@ const SignupForm = () => {
     }).then((response)=> {
       if(response.ok){
         alert("You are Successfully Registered, You can login now")
+        navigate("/login")
+
       }
       else{
-        alert('Some Error Occured, Try after some time')
+        response.json().then((message)=>alert(message.error))
       }
     })
   };
