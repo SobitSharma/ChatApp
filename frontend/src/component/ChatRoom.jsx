@@ -6,7 +6,7 @@ import notificationsound from "../assets/sounds/notification.mp3";
 
 const ChatRoom = () => {
   const { sideBarUsers } = useUserContext();
-  const { userLogin } = useUserContext();
+  const { userLogin, UserInfo } = useUserContext();
   const [newMessage, setNewMessage] = useState("");
   const [selectUser, setSelectUser] = useState(null);
   const [previousmessages, setpreviousmessages] = useState({});
@@ -17,13 +17,19 @@ const ChatRoom = () => {
 
   useEffect(() => {
     if (selectUser) {
+      if(previousmessages?.[selectUser.fullname]){
+        setloading(true)
+        return
+      }
       fetch(`http://localhost:8000/api/messages/${selectUser._id}`, {
         method: "GET",
         credentials: "include",
       })
         .then((response) => response.json())
         .then((result) => {
-          setpreviousmessages({ [selectUser.fullname]: result });
+          setpreviousmessages((previous)=>{
+            return {...previous, [selectUser.fullname]:result}
+          });
           setloading(true);
         });
     }
@@ -35,12 +41,15 @@ const ChatRoom = () => {
         newMessage.shouldshake = true;
         const sound = new Audio(notificationsound);
         sound.play();
-        if (newMessage.senderId !== userLogin._id) {
+        if (newMessage.senderId !== UserInfo._id) {
+          const tempUser = sideBarUsers.filter(
+            (user) => user._id == newMessage.senderId
+          );
           setpreviousmessages((previous) => {
-            const userMessages = previous[selectUser?.fullname] || [];
+            const userMessages = previous[tempUser[0]?.fullname] || [];
             return {
               ...previous,
-              [selectUser?.fullname]: [...userMessages, newMessage],
+              [tempUser[0]?.fullname]: [...userMessages, newMessage],
             };
           });
         }
@@ -60,7 +69,8 @@ const ChatRoom = () => {
     if (newMessage) {
       const messageData = {
         message: newMessage,
-        senderId: userLogin._id,
+        senderId: UserInfo._id,
+        receiverId: selectUser._id,
         _id: Date.now().toString(),
       };
       setpreviousmessages((previous) => {
@@ -79,7 +89,11 @@ const ChatRoom = () => {
         credentials: "include",
       })
         .then((response) => response.json())
-        .catch((err) => alert("There is an error while sending this message. Please send it again."));
+        .catch((err) =>
+          alert(
+            "There is an error while sending this message. Please send it again."
+          )
+        );
       setNewMessage("");
       scrollToBottom();
     } else {
@@ -102,13 +116,13 @@ const ChatRoom = () => {
   function HandleLogout() {
     fetch("http://localhost:8000/api/auth/logout", {
       method: "POST",
-      credentials: 'include'
+      credentials: "include",
     }).then((response) => {
       if (response.ok) {
         alert("You have successfully logged out");
         navigate("/login");
       }
-    })
+    });
   }
 
   return userLogin ? (
@@ -117,9 +131,9 @@ const ChatRoom = () => {
         <div className="flex flex-col items-center p-4 border-b bg-white">
           <div className="flex flex-row">
             <h2 className="text-xl font-semibold">Contacts</h2>
-            <img 
-              src="https://cdn1.iconfinder.com/data/icons/heroicons-ui/24/logout-512.png" 
-              alt="Logout" 
+            <img
+              src="https://cdn1.iconfinder.com/data/icons/heroicons-ui/24/logout-512.png"
+              alt="Logout"
               className="rounded-xl bg-gray-400 h-10 ml-6 hover:cursor-pointer"
               onClick={HandleLogout}
             />
@@ -137,6 +151,9 @@ const ChatRoom = () => {
                   if (!(previous === user)) {
                     setloading(false);
                     return user;
+                  }
+                  else{
+                    return previous
                   }
                 });
               }}
@@ -188,32 +205,77 @@ const ChatRoom = () => {
             </div>
             <div className="flex flex-col flex-grow p-4 overflow-y-auto">
               <ul className="space-y-2">
-                {loading
-                  ? previousmessages[selectUser.fullname].map((message) =>
-                      message.senderId === selectUser._id ? (
-                        <li
-                          className={`bg-gray-300 p-4 rounded-lg self-start max-w-xs ${
-                            message.shouldshake ? "shake" : ""
+                {loading ? (
+                  previousmessages[selectUser.fullname].map((message) =>
+                    message.senderId === UserInfo._id ? (
+                      <div
+                        key={message._id}
+                        className="flex flex-row items-start"
+                      >
+                        <img
+                          src={UserInfo.profilePic}
+                          alt=""
+                          className="h-10 rounded-full mr-2"
+                        />
+                        <div
+                          className={`bg-gray-300 p-4 rounded-lg max-w-xs${
+                            message.shouldshake ? " shake" : ""
                           }`}
-                          key={message._id}
                         >
-                          {message.message}
-                        </li>
-                      ) : (
-                        <li
-                          className={`bg-blue-500 text-white p-4 rounded-lg self-end max-w-xs ${
-                            message.shouldshake ? "shake" : ""
+                          <p
+                            className="mb-1"
+                            style={{
+                              wordBreak: "break-word",
+                              whiteSpace: "pre-wrap",
+                              maxWidth: "100%", 
+                            }}
+                          >
+                            {message.message}
+                          </p>
+                          <p className="text-xs text-gray-600">
+                            {UserInfo.fullname}
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div
+                        key={message._id}
+                        className="flex flex-row items-start justify-end"
+                      >
+                        <div
+                          className={`bg-blue-500 text-white p-4 rounded-lg max-w-xs ml-10${
+                            message.shouldshake ? " shake" : ""
                           }`}
-                          key={message._id}
                         >
-                          {message.message}
-                        </li>
-                      )
+                          <p
+                            className="mb-1"
+                            style={{
+                              wordBreak: "break-word",
+                              whiteSpace: "pre-wrap",
+                              maxWidth: "100%",
+                            }}
+                          >
+                            {message.message}
+                          </p>
+                          <p className="text-xs text-white">
+                            {selectUser.fullname}
+                          </p>
+                        </div>
+                        <img
+                          src={selectUser.profilePic}
+                          alt=""
+                          className="h-10 rounded-full ml-2"
+                        />
+                      </div>
                     )
-                  : "Loading previous messages..."}
+                  )
+                ) : (
+                  <p>Loading previous messages...</p>
+                )}
                 <div ref={messagesEndRef} />
               </ul>
             </div>
+
             <form
               onSubmit={HandleSendMessages}
               className="flex items-center p-4 border-t bg-gray-100"
