@@ -15,6 +15,7 @@ const ChatRoom = () => {
   const { onlineusers, socket } = useSocketContext();
   const messagesEndRef = useRef(null);
 
+
   useEffect(() => {
     if (selectUser) {
       if(previousmessages?.[selectUser.fullname]){
@@ -30,14 +31,18 @@ const ChatRoom = () => {
           setpreviousmessages((previous)=>{
             return {...previous, [selectUser.fullname]:result}
           });
-          setloading(true);
         });
     }
   }, [selectUser]);
 
+  useEffect(()=> {
+    setloading(true);
+  }, [previousmessages])
+
   useEffect(() => {
     if (socket) {
       socket.on("newMessage", (newMessage) => {
+        console.log(newMessage)
         newMessage.shouldshake = true;
         const sound = new Audio(notificationsound);
         sound.play();
@@ -70,6 +75,7 @@ const ChatRoom = () => {
       const messageData = {
         message: newMessage,
         senderId: UserInfo._id,
+        updatedAt:new Date().toISOString(),
         receiverId: selectUser._id,
         _id: Date.now().toString(),
       };
@@ -125,8 +131,27 @@ const ChatRoom = () => {
     });
   }
 
+  useEffect(()=>{scrollToBottom()}, [selectUser])
+
+  function convertDataAndTime(isoString){
+    const date = new Date(isoString);
+  
+    let hours = date.getHours();  
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    const seconds = date.getSeconds().toString().padStart(2, "0");
+    const ampm = hours >= 12 ? "PM" : "AM";
+  
+    hours = hours % 12;
+    hours = hours ? hours : 12;  
+    const formattedHours = hours.toString().padStart(2, "0");
+  
+    const formattedTime = `${formattedHours}:${minutes} ${ampm}`;
+    return formattedTime;
+  }
+
   return userLogin ? (
     <div className="flex h-screen bg-gray-100">
+      
       <div className="flex flex-col w-1/4 bg-gray-200 border-r">
         <div className="flex flex-col items-center p-4 border-b bg-white">
           <div className="flex flex-row">
@@ -139,45 +164,46 @@ const ChatRoom = () => {
             />
           </div>
         </div>
-        <div className="overflow-y-auto flex-grow">
-          {sideBarUsers.map((user) => (
-            <div
-              className={`flex items-center p-4 cursor-pointer hover:bg-gray-300 ${
-                selectUser && selectUser._id === user._id ? "bg-gray-400" : ""
-              }`}
-              key={user._id}
-              onClick={() => {
-                setSelectUser((previous) => {
-                  if (!(previous === user)) {
-                    setloading(false);
-                    return user;
-                  }
-                  else{
-                    return previous
-                  }
-                });
-              }}
-            >
-              <img
-                src={user.profilePic}
-                alt=""
-                className="rounded-full h-12 w-12"
-              />
-              <div className="ml-4">
-                <div className="text-lg font-semibold">{user.username}</div>
-                <div
-                  className={`text-sm ${
-                    onlineusers.includes(user._id)
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
-                >
-                  {onlineusers.includes(user._id) ? "Online" : "Offline"}
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="overflow-y-auto flex-grow p-4 bg-gray-100">
+  {sideBarUsers?.map((user) => (
+    <div
+      className={`flex flex-col sm:flex-row items-center p-4 mb-2 rounded-lg cursor-pointer transition duration-300 ease-in-out transform hover:bg-gray-200 ${
+        selectUser && selectUser._id === user._id ? "bg-gray-300" : ""
+      }`}
+      key={user._id}
+      onClick={() => {
+        setSelectUser((previous) => {
+          if (previous !== user) {
+            setloading(true);
+            return user;
+          } else {
+            return previous;
+          }
+        });
+      }}
+    >
+      <img
+        src={user.profilePic}
+        alt=""
+        className="rounded-full h-12 w-12 object-cover"
+      />
+      <div className="ml-4 mt-2 sm:mt-0 flex-grow text-center sm:text-left">
+        <div className="text-lg font-semibold text-gray-800">{user.username}</div>
+        <div
+          className={`text-sm ${
+            onlineusers.includes(user._id)
+              ? "text-green-500"
+              : "text-red-500"
+          }`}
+        >
+          {onlineusers.includes(user._id) ? "Online" : "Offline"}
         </div>
+      </div>
+    </div>
+  ))}
+</div>
+
+
       </div>
       <div className="flex flex-col w-3/4 bg-white">
         {selectUser ? (
@@ -206,7 +232,7 @@ const ChatRoom = () => {
             <div className="flex flex-col flex-grow p-4 overflow-y-auto">
               <ul className="space-y-2">
                 {loading ? (
-                  previousmessages[selectUser.fullname].map((message) =>
+                  previousmessages[selectUser.fullname]?.map((message) =>
                     message.senderId === UserInfo._id ? (
                       <div
                         key={message._id}
@@ -233,7 +259,7 @@ const ChatRoom = () => {
                             {message.message}
                           </p>
                           <p className="text-xs text-gray-600">
-                            {UserInfo.fullname}
+                            {convertDataAndTime(message.updatedAt)}
                           </p>
                         </div>
                       </div>
@@ -258,7 +284,7 @@ const ChatRoom = () => {
                             {message.message}
                           </p>
                           <p className="text-xs text-white">
-                            {selectUser.fullname}
+                            {convertDataAndTime(message.updatedAt)}
                           </p>
                         </div>
                         <img
