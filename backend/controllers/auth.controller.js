@@ -1,6 +1,18 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs"
 import generateTokenAndSetCookie from "../utils/generateToken.js";
+import { Mail } from "../Email/email.js";
+
+
+let authenticateOTP = ""
+const generateOTP = () => {
+    let value = ""
+    for(let i=0; i<4; i++){
+        value+=Math.floor(Math.random()*9)
+    }
+    authenticateOTP = value;
+    return value;
+}
 
 const login = async(req, res)=> {
     try {
@@ -34,39 +46,62 @@ const logout = async(req, res)=> {
     }
 }
 
+const signUpDetailsVerification  = async(req, res)=>{
+    const {fullname, username, password, confirmPassword, email}= req.body;
+    if(password!==confirmPassword){
+        return res.status(400).json({
+            error:"Passwords donnot match"
+        })
+    }
+
+    const characters = /[A-Z]/g;
+    const Numbers = /[1-9]/g;
+    const specialchar = /[!@#$%^&*(){};:'<>,.]/g;
+
+    if(password.length < 8){
+        return res.status(400).json({
+            error:"Password length should be greater than 8"
+        })
+    }
+
+    if(!(password.match(characters)) || !(password.match(Numbers)) || !(password.match(specialchar))){
+        console.log(password)
+        console.log(password.match(characters),password.match(Numbers),password.match(specialchar))
+        return res.status(400).json({
+            error:
+            "Password is not Valid Rules for password are: Atleast one CapitalCharacter, Number, SpecialCharacter(allowed special chars [!@#$%^&*(){}[];:'<>,.+])"
+        })
+    }
+
+    const user = await User.findOne({username});
+    if(user){
+        return res.status(400).json({error:"Username already exists"})
+    }
+
+    const seeemail = await User.findOne({email});
+    if(seeemail){
+        return res.status(400).json({error:"This Email Id already Exists. Please Provide a different One"})
+    }
+    const mailVerification = await Mail({
+        To:email,
+        subject:"Welcoming Message",
+        text:`This mail is To verify Your Identity Please Enter This OTP to verify Yourself ${generateOTP()}`
+    })
+    
+    if(mailVerification == "error"){
+        return res.status(400).json({error:"There is Some Problem with the Provided Email Address. We are not Able to Verify it"})
+    }
+    return res.status(200).json({message:"All Details are Verified Except The Email"})
+}
+
 const signup = async(req, res)=> {
     try {
-        const {fullname, username, password, confirmPassword, gender}= req.body;
-        if(password!==confirmPassword){
-            return res.status(400).json({
-                error:"Passwords donnot match"
-            })
+        const {fullname, username, password, gender, email, OTP}= req.body
+
+        if(!(OTP === authenticateOTP)){
+            return res.status(401).json({error:"OTP Authentication Failed"})
         }
 
-        const characters = /[A-Z]/g;
-        const Numbers = /[1-9]/g;
-        const specialchar = /[!@#$%^&*(){};:'<>,.]/g;
-
-        if(password.length < 8){
-            return res.status(400).json({
-                error:"Password length should be greater than 8"
-            })
-        }
-
-        if(!(password.match(characters)) || !(password.match(Numbers)) || !(password.match(specialchar))){
-            console.log(password)
-            console.log(password.match(characters),password.match(Numbers),password.match(specialchar))
-            return res.status(400).json({
-                error:
-                "Password is not Valid Rules for password are: Atleast one CapitalCharacter, Number, SpecialCharacter(allowed special chars [!@#$%^&*(){}[];:'<>,.+])"
-            })
-        }
-
-        const user = await User.findOne({username});
-        if(user){
-            return res.status(400).json({error:"Username already exists"})
-        }
-        
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -78,6 +113,7 @@ const signup = async(req, res)=> {
             username,
             password:hashedPassword,
             gender,
+            email,
             profilePic: gender=="male"?boyprofilePic : girlProfilePic
         })
         if(newUser){
@@ -87,8 +123,8 @@ const signup = async(req, res)=> {
                 _id:newUser._id,
                 fullname:newUser.fullname,
                 username:newUser.username,
-                profilePic:newUser.profilePic
-        
+                profilePic:newUser.profilePic,
+                email:newUser.email
             });
         }
         else{
@@ -105,5 +141,6 @@ const signup = async(req, res)=> {
 export {
     login,
     logout,
-    signup
+    signup,
+    signUpDetailsVerification
 }
