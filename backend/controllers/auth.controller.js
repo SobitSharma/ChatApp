@@ -5,7 +5,7 @@ import { Mail } from "../Email/email.js";
 
 
 let authenticateOTP = ""
-const generateOTP = () => {
+export const generateOTP = () => {
     let value = ""
     for(let i=0; i<4; i++){
         value+=Math.floor(Math.random()*9)

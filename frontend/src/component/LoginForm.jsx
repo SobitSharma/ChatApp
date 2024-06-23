@@ -89,6 +89,11 @@ const LoginForm = () => {
               Create an account? <a href="/" className="text-blue-500 hover:text-blue-700">Sign Up</a>
             </p>
           </div>
+          <div className="mt-4 text-center">
+            <p className="text-gray-600 text-sm">
+              Forgot Password ? <a href="/forgotpassword" className="text-blue-500 hover:text-blue-700">Forgot Password</a>
+            </p>
+          </div>
         </form>
       </div>
     </div>

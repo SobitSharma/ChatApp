@@ -6,6 +6,7 @@ import {createBrowserRouter, createRoutesFromElements, Route, RouterProvider} fr
 import SignupForm from './component/Signup.jsx'
 import LoginForm from './component/LoginForm.jsx'
 import ChatRoom from './component/ChatRoom.jsx'
+import ForgotPassword from './component/ForgotPassword.jsx'
 
 
 const router = createBrowserRouter(
@@ -14,6 +15,7 @@ const router = createBrowserRouter(
       <Route path='' element={<SignupForm/>}></Route>
       <Route path='/login' element={<LoginForm/>}></Route>
       <Route path='/room' element={<ChatRoom/>}></Route>
+      <Route path='/forgotpassword' element={<ForgotPassword/>}></Route>
     </Route>
   )
 )

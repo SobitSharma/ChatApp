@@ -7,6 +7,7 @@ import router from "./routes/message.routes.js";
 import userrouter from "./routes/user.routes.js";
 import cors from "cors"
 import { app, server } from "./soket/socket.js";
+import { updaterouter } from "./routes/updateDetails.js";
 dotenv.config()
 
 app.use(express.json()); 
@@ -18,6 +19,7 @@ const PORT = process.env.PORT || 3000
 app.use("/api/auth", authrouter)                    
 app.use("/api/messages", router)
 app.use("/api/users",userrouter)
+app.use("/api/updates",updaterouter)
 
 connectToMongoDB().then((response)=> {
     if(!response){
