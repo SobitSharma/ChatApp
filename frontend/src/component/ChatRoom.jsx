@@ -3,6 +3,7 @@ import { useUserContext } from "../Context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useSocketContext } from "../Context/SocketContext";
 import notificationsound from "../assets/sounds/notification.mp3";
+import ProfileDashboard from "./ProfileDashboard";
 
 const ChatRoom = () => {
   const { sideBarUsers } = useUserContext();
@@ -26,7 +27,15 @@ const ChatRoom = () => {
         method: "GET",
         credentials: "include",
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if(response.ok){
+            return response.json()
+          }
+          response.json().then((result)=>{
+            alert("Your Session has expired Please Login Again")
+            return navigate("/login")
+          } )
+        })
         .then((result) => {
           setpreviousmessages((previous)=>{
             return {...previous, [selectUser.fullname]:result}
@@ -154,7 +163,13 @@ const ChatRoom = () => {
       
       <div className="flex flex-col w-1/4 bg-gray-200 border-r">
         <div className="flex flex-col items-center p-4 border-b bg-white">
-          <div className="flex flex-row">
+          <div className="flex flex-row items-center w-full justify-between">
+          <img
+              src={UserInfo.profilePic}
+              alt="Logout"
+              className="rounded-xl bg-gray-400 h-12 w-12 ml-6 hover:cursor-pointer"
+              onClick={()=>navigate("/profile")} 
+            />
             <h2 className="text-xl font-semibold">Contacts</h2>
             <img
               src="https://cdn1.iconfinder.com/data/icons/heroicons-ui/24/logout-512.png"
@@ -241,7 +256,7 @@ const ChatRoom = () => {
                         <img
                           src={UserInfo.profilePic}
                           alt=""
-                          className="h-10 rounded-full mr-2"
+                          className="h-12 rounded-full mr-2 w-8"
                         />
                         <div
                           className={`bg-gray-300 p-4 rounded-lg max-w-xs${

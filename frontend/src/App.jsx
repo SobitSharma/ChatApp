@@ -20,8 +20,19 @@ function App() {
     setsideBarUsers(users)
   }
 
+  const updateUserFullname = (name)=> {
+    setUserInfo((previouse)=> {
+      return {...previouse, fullname:name}
+    })
+  }
+
+  const updateUserProfilePic = (url)=> {
+    setUserInfo((previouse)=> {
+      return {...previouse, profilePic:url}
+    })
+  }
   return (
-    <UserContext.Provider value={{userLogin, UserInfo, changeStatus, ChangeUserInfo, sideBarUsers, updateUsers}}>
+    <UserContext.Provider value={{userLogin, UserInfo, changeStatus, ChangeUserInfo, sideBarUsers, updateUsers, updateUserFullname, updateUserProfilePic}}>
       <SocketContextProvider>
         <Outlet/>  
       </SocketContextProvider>

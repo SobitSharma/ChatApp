@@ -6,7 +6,9 @@ export const UserContext = createContext({
     UserInfo:{},
     ChangeUserInfo:{},
     sideBarUsers:[],
-    updateUsers:()=>{}
+    updateUsers:()=>{},
+    updateUserFullname :()=>{},
+    updateUserProfilePic:()=>{}
 })
 
 

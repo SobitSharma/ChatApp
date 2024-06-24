@@ -7,6 +7,7 @@ import SignupForm from './component/Signup.jsx'
 import LoginForm from './component/LoginForm.jsx'
 import ChatRoom from './component/ChatRoom.jsx'
 import ForgotPassword from './component/ForgotPassword.jsx'
+import ProfileDashboard from './component/ProfileDashboard.jsx'
 
 
 const router = createBrowserRouter(
@@ -16,6 +17,7 @@ const router = createBrowserRouter(
       <Route path='/login' element={<LoginForm/>}></Route>
       <Route path='/room' element={<ChatRoom/>}></Route>
       <Route path='/forgotpassword' element={<ForgotPassword/>}></Route>
+      <Route path='/profile' element={<ProfileDashboard/>}></Route>
     </Route>
   )
 )
