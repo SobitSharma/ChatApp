@@ -8,14 +8,12 @@ export const useSocketContext = ()=> {
     return useContext(SocketContext)
 }
 
-
 export const SocketContextProvider = ({ children }) => {
   const [socket, setsocket] = useState(null);
   const [onlineusers, setonlineusers] = useState([]);
   const { userLogin, UserInfo } = useUserContext();
 
   useEffect(() => {
-    console.log(userLogin)
     if (userLogin) {
       const socket = io("http://localhost:8000", {
         query:{

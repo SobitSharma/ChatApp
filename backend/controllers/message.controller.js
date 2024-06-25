@@ -23,18 +23,17 @@ const sendMessage = async(req, res)=> {
         const newMessage = new Message({
             senderId,
             receiverId,
-            message
+            message,
+            type:"text"
         })
 
         if(newMessage){
             conversation.messages.push(newMessage._id)
         }
-        // await conversation.save();
-        // await newMessage.save();
 
         await Promise.all([conversation.save(), newMessage.save()]);
         const receiverSocketId = getReceiverId(receiverId)
-        if(receiverSocketId){
+        if(receiverSocketId){ 
            io.to(receiverSocketId).emit("newMessage",newMessage)
         }
         res.status(201).json(newMessage);

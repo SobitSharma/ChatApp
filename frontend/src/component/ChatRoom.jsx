@@ -3,7 +3,7 @@ import { useUserContext } from "../Context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useSocketContext } from "../Context/SocketContext";
 import notificationsound from "../assets/sounds/notification.mp3";
-import ProfileDashboard from "./ProfileDashboard";
+import SendImages from "./SendImages";
 
 const ChatRoom = () => {
   const { sideBarUsers } = useUserContext();
@@ -16,13 +16,12 @@ const ChatRoom = () => {
   const { onlineusers, socket } = useSocketContext();
   const messagesEndRef = useRef(null);
 
-
   useEffect(() => {
     if (selectUser) {
       if(previousmessages?.[selectUser.fullname]){
         setloading(true)
         return
-      }
+      }  
       fetch(`http://localhost:8000/api/messages/${selectUser._id}`, {
         method: "GET",
         credentials: "include",
@@ -86,7 +85,8 @@ const ChatRoom = () => {
         senderId: UserInfo._id,
         updatedAt:new Date().toISOString(),
         receiverId: selectUser._id,
-        _id: Date.now().toString(),
+        _id: Date.now().toString(), 
+        type:"text"  
       };
       setpreviousmessages((previous) => {
         const userMessages = previous[selectUser.fullname] || [];
@@ -262,7 +262,9 @@ const ChatRoom = () => {
                           className={`bg-gray-300 p-4 rounded-lg max-w-xs${
                             message.shouldshake ? " shake" : ""
                           }`}
-                        >
+                        >  
+                        {
+                          message.type=="text"?
                           <p
                             className="mb-1"
                             style={{
@@ -271,8 +273,11 @@ const ChatRoom = () => {
                               maxWidth: "100%", 
                             }}
                           >
-                            {message.message}
+                            {message.message} 
                           </p>
+                          : <img src={message.message} alt="" />
+
+                        }
                           <p className="text-xs text-gray-600">
                             {convertDataAndTime(message.updatedAt)}
                           </p>
@@ -288,16 +293,21 @@ const ChatRoom = () => {
                             message.shouldshake ? " shake" : ""
                           }`}
                         >
+                            {
+                          message.type=="text"?
                           <p
                             className="mb-1"
                             style={{
                               wordBreak: "break-word",
                               whiteSpace: "pre-wrap",
-                              maxWidth: "100%",
+                              maxWidth: "100%", 
                             }}
                           >
                             {message.message}
                           </p>
+                          : <img src={message.message} alt="" />
+
+                        }
                           <p className="text-xs text-white">
                             {convertDataAndTime(message.updatedAt)}
                           </p>
@@ -317,6 +327,7 @@ const ChatRoom = () => {
               </ul>
             </div>
 
+            <SendImages selectUser={selectUser} senderId={UserInfo._id} setpreviousmessages={setpreviousmessages}/>
             <form
               onSubmit={HandleSendMessages}
               className="flex items-center p-4 border-t bg-gray-100"

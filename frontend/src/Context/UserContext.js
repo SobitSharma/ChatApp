@@ -8,7 +8,8 @@ export const UserContext = createContext({
     sideBarUsers:[],
     updateUsers:()=>{},
     updateUserFullname :()=>{},
-    updateUserProfilePic:()=>{}
+    updateUserProfilePic:()=>{},
+    updatePreviousMessages:()=>{}
 })
 
 

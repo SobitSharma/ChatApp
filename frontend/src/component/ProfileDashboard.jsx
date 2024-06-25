@@ -41,7 +41,7 @@ function ProfileDashboard() {
     const month = String(date.getUTCMonth() + 1).padStart(2, '0'); // Months are zero-based
     const day = String(date.getUTCDate()).padStart(2, '0');
 
-    return `${day}:${month}:${year}`
+    return `${day}/${month}/${year}`
 }
 
   const HandleImageButton = ()=> {
@@ -60,7 +60,7 @@ function ProfileDashboard() {
       fetch("http://localhost:8000/api/updates/updateprofilepic", {
         method:'POST',
         body:formdata,
-        credentials:'include'
+        credentials:'include' 
       }).then((response)=>response.json()).
       then((result)=>{
         if(result.url){
@@ -78,11 +78,11 @@ function ProfileDashboard() {
     userLogin?
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-md max-w-lg w-full">
-      <div 
-      className='bg-gray-400 text-2xl text-black rounded-lg text-center p-2 hover:bg-green-200 hover:p-4'
+        <div className="relative flex flex-col items-center gap-2">
+        <div 
+      className='bg-gray-400 text-2xl text-black rounded-lg text-center p-2 hover:bg-red-500'
       onClick={()=>navigate("/room")}
       >BACK</div>
-        <div className="relative flex flex-col items-center">
           {
             imageflag ? 
             <img
@@ -114,8 +114,9 @@ function ProfileDashboard() {
               {edit ? "Edit" : "Save"}
             </button>
           </div>
-          <h3 className="text-gray-600 mt-4">
-            User Since {`${extractDayMonthYear(UserInfo.createdAt)}`}
+          <h3 className="text-gray-600 mt-4 text-xl">
+            <b>
+            User Since {`${extractDayMonthYear(UserInfo.createdAt)}`}</b>
           </h3>
         </div>
       </div>
