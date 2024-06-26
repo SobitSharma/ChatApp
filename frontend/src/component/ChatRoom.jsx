@@ -7,7 +7,7 @@ import SendImages from "./SendImages";
 
 const ChatRoom = () => {
   const { sideBarUsers } = useUserContext();
-  const { userLogin, UserInfo } = useUserContext();
+  const { userLogin, UserInfo, changeStatus } = useUserContext();
   const [newMessage, setNewMessage] = useState("");
   const [selectUser, setSelectUser] = useState(null);
   const [previousmessages, setpreviousmessages] = useState({});
@@ -117,9 +117,8 @@ const ChatRoom = () => {
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "instant"});
   };
-
   useEffect(() => {
     scrollToBottom();
   }, [previousmessages, loading]);
@@ -135,6 +134,7 @@ const ChatRoom = () => {
     }).then((response) => {
       if (response.ok) {
         alert("You have successfully logged out");
+        changeStatus(false);
         navigate("/login");
       }
     });

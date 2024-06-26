@@ -16,7 +16,9 @@ const SendImages = ({selectUser, setpreviousmessages}) => {
         if(!validateOfImages){
             return alert("Only Image Files are Allowed")
         }
+
         setloading(true)
+
         const formdata = new FormData()
         formdata.append("image", file)
 

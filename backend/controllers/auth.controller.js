@@ -4,6 +4,7 @@ import generateTokenAndSetCookie from "../utils/generateToken.js";
 import { Mail } from "../Email/email.js";
 
 
+
 let authenticateOTP = ""
 export const generateOTP = () => {
     let value = ""
