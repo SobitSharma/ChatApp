@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs"
 import generateTokenAndSetCookie from "../utils/generateToken.js";
 import { Mail } from "../Email/email.js";
+import UserGroup from "../models/usergroups.model.js";
 
 
 
@@ -118,6 +119,15 @@ const signup = async(req, res)=> {
             email,
             profilePic: gender=="male"?boyprofilePic : girlProfilePic
         })
+
+        const usergroup = new UserGroup({
+            Person:newUser._id,
+            Groups:[]
+        })
+
+        await usergroup.save()
+
+
         if(newUser){
             await newUser.save();
             generateTokenAndSetCookie(newUser._id, res);

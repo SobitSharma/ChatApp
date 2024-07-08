@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useUserContext } from "./UserContext";
 import io from "socket.io-client";
+import { usegroupContext } from "./GroupContext";
 
 export const SocketContext = createContext();
 
@@ -12,6 +13,8 @@ export const SocketContextProvider = ({ children }) => {
   const [socket, setsocket] = useState(null);
   const [onlineusers, setonlineusers] = useState([]);
   const { userLogin, UserInfo } = useUserContext();
+  const {appendGroupMessages} = usegroupContext()
+  const [newIncomingMessage, setnewIncomingMessage] = useState({})
 
   useEffect(() => {
     if (userLogin) {
@@ -24,6 +27,10 @@ export const SocketContextProvider = ({ children }) => {
       socket.on("getOnlineUsers", (users)=> {
         setonlineusers(users)
       })
+      socket.on("groupmessage", (message)=> {
+        console.log(message)
+        setnewIncomingMessage(message)
+      })
 
       return () => socket.close();
     } else {
@@ -35,7 +42,7 @@ export const SocketContextProvider = ({ children }) => {
   }, [userLogin]);
 
   return (
-    <SocketContext.Provider value={{ socket, onlineusers }}>
+    <SocketContext.Provider value={{ socket, onlineusers , newIncomingMessage, setnewIncomingMessage}}>
       {children}
     </SocketContext.Provider>
   );

@@ -178,6 +178,12 @@ const ChatRoom = () => {
               onClick={HandleLogout}
             />
           </div>
+          <div>
+            <button 
+            className="bg-green-200 p-2 rounded-xl hover:bg-green-400"
+            onClick={()=>navigate('/groups')}
+            >Check Your Groups</button>
+          </div>
         </div>
         <div className="overflow-y-auto flex-grow p-4 bg-gray-100">
   {sideBarUsers?.map((user) => (
@@ -270,7 +276,7 @@ const ChatRoom = () => {
                             style={{
                               wordBreak: "break-word",
                               whiteSpace: "pre-wrap",
-                              maxWidth: "100%", 
+                              maxWidth: "100%",   
                             }}
                           >
                             {message.message} 
@@ -354,7 +360,7 @@ const ChatRoom = () => {
           </div>
         )}
       </div>
-    </div>
+      </div>
   ) : (
     <div className="flex items-center justify-center h-screen bg-gray-200">
       <div className="text-center">

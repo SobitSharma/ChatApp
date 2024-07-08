@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
@@ -8,6 +8,10 @@ import LoginForm from './component/LoginForm.jsx'
 import ChatRoom from './component/ChatRoom.jsx'
 import ForgotPassword from './component/ForgotPassword.jsx'
 import ProfileDashboard from './component/ProfileDashboard.jsx'
+import Groups from './component/Groups.jsx'
+import NewGroupForm from './component/NewGroupForm.jsx'
+import { SocketContextProvider } from './Context/SocketContext.jsx'
+import AddNewUsers from './component/AddNewUsers.jsx'
 
 
 const router = createBrowserRouter(
@@ -18,6 +22,9 @@ const router = createBrowserRouter(
       <Route path='/room' element={<ChatRoom/>}></Route>
       <Route path='/forgotpassword' element={<ForgotPassword/>}></Route>
       <Route path='/profile' element={<ProfileDashboard/>}></Route>
+      <Route path='/groups' element={<Groups/>}></Route>
+      <Route path='/newgroup' element={<NewGroupForm/>}></Route>
+      <Route path='/addusers' element={<AddNewUsers/>}></Route>
     </Route>
   )
 )
