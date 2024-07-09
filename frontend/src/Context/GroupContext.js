@@ -5,7 +5,9 @@ export const groupContext = createContext({
     updateUserGroupInfo:()=>{},
     userGroupMessages:{},
     updateuserGroupMessages:()=>{},
-    appendGroupMessages:()=>{}
+    appendGroupMessages:()=>{},
+    ChangeFlag:null,
+    updateChangeFlag:()=>{}
 })
 
 

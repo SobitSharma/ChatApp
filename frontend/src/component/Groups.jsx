@@ -13,6 +13,7 @@ function Groups() {
   const navigate = useNavigate()
   const {newIncomingMessage} = useSocketContext();  
   const newMessageRef = useRef(null)  
+  const [showparticipantsFlag, setshowparticipantsFlag] = useState(false)
 
   useEffect(()=>{
     if(!(isEmpty(newIncomingMessage)) && !(userGroupMessages[newIncomingMessage.receiverId]?.includes(newIncomingMessage))){
@@ -37,15 +38,16 @@ function Groups() {
         credentials: 'include'
       }).then((response) => response.json())
         .then((result) => {
-          updateUserGroupInfo(result.usergroup);  
-          getMessagesFromFetchedData()
+          console.log("Data Received")
+          updateUserGroupInfo(()=>result.usergroup);  
+          getMessagesFromFetchedData(result.usergroup)
         });
     }
   }, []);     
 
-  function getMessagesFromFetchedData(){
+  function getMessagesFromFetchedData(answer){
     const tempDataHolder = {}
-    userGroupInfo?.Groups?.map((singleuser)=>{
+    answer?.Groups?.map((singleuser)=>{
       tempDataHolder[singleuser._id]=singleuser.groupmessages
     })
     updateuserGroupMessages(tempDataHolder)
@@ -79,7 +81,8 @@ function Groups() {
       receiverId:selectedGroup._id,
       message:newMessage,
       type:"text",
-      sendername:UserInfo.fullname
+      sendername:UserInfo.fullname,
+      createdAt:Date.now()
     }
 
     const groupId = selectedGroup?._id;
@@ -95,7 +98,7 @@ function Groups() {
     }).then((response)=> {
       if(response.ok){
         appendGroupMessages(selectedGroup._id, createNewMessage)
-        scrollToBottom()
+        scrollToBottom();
       }
       else{
         alert("Server Crashed Try again After Some Time")
@@ -105,10 +108,13 @@ function Groups() {
   }
 
   const HandleParticipants = () => {
-    setparflag((prev)=>!prev)
+    setshowparticipantsFlag(true)
   }
 
- 
+  useEffect(()=> {
+    scrollToBottom();
+  }, [selectedGroup])
+
   return (
     userLogin?
     <div>
@@ -119,7 +125,11 @@ function Groups() {
     <div className='flex flex-row bg-gray-100 h-screen'>
       <div className='bg-gray-200 flex flex-col w-1/4 p-4 overflow-y-auto'>
         <div className='bg-gray-100 text-xl text-center p-2 mb-4'>
-          <h3>Your Groups</h3>
+          <div className='flex flex-row bg-gray-400 justify-between p-2'>
+          <h3 className='bg-white text-black rounded-lg p-2'>Your Groups</h3>
+          <button className='bg-white text-black rounded-lg p-2 hover:bg-red-200'
+          onClick={()=>navigate('/newgroup')}>Create a New One</button>
+          </div>
         </div>
         {
           userGroupInfo?.Groups?.map((singleUser) => (
@@ -139,7 +149,27 @@ function Groups() {
           <>
             <div className='bg-gray-100 p-4 text-lg font-semibold border-b flex flex-row justify-around'>
               <div> {selectedGroup.groupname} </div>
-              <button className='' onClick={HandleParticipants}>Partcipants</button>
+              {
+                !showparticipantsFlag ? <button className='' onClick={HandleParticipants}>Partcipants</button> 
+                :
+                <div className='bg-gray-200 p-4 rounded-lg shadow-md'>
+                <button
+                  onClick={() => setshowparticipantsFlag(false)}
+                  className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline'
+                >
+                  Close
+                </button>
+                <ul className='mt-3'>
+                  {selectedGroup?.participants?.map((singleuser) => (
+                    <li key={singleuser._id} className='text-gray-800'>
+                      {singleuser.fullname}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              }
+              {/* <button className='' onClick={HandleParticipants}>Partcipants</button> */}
               <button onClick={()=>navigate('/addusers', {state:{groupId:selectedGroup._id, participants:selectedGroup.participants}})}>Add Participants</button>
             </div>
             <div className='flex-grow p-4 overflow-y-auto'>

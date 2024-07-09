@@ -10,6 +10,7 @@ function App() {
   const [sideBarUsers, setsideBarUsers] = useState([])
   const [userGroupInfo, setUserGroupInfo] = useState({})
   const [userGroupMessages, setuserGroupMessages] = useState({})
+
   
   const appendGroupMessages = (id, message) => {
     console.log("looooo")
@@ -54,7 +55,8 @@ function App() {
   return (
     <UserContext.Provider value={{userLogin, UserInfo, changeStatus, ChangeUserInfo, sideBarUsers, updateUsers, updateUserFullname, updateUserProfilePic}}>
       <SocketContextProvider>
-         <groupContext.Provider value={{userGroupInfo, updateUserGroupInfo, userGroupMessages, updateuserGroupMessages, appendGroupMessages}}>
+         <groupContext.Provider value={{userGroupInfo, updateUserGroupInfo, userGroupMessages, updateuserGroupMessages, appendGroupMessages,
+         }}>
         <Outlet/>  
         </groupContext.Provider>
       </SocketContextProvider>

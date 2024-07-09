@@ -10,7 +10,6 @@ import ForgotPassword from './component/ForgotPassword.jsx'
 import ProfileDashboard from './component/ProfileDashboard.jsx'
 import Groups from './component/Groups.jsx'
 import NewGroupForm from './component/NewGroupForm.jsx'
-import { SocketContextProvider } from './Context/SocketContext.jsx'
 import AddNewUsers from './component/AddNewUsers.jsx'
 
 

@@ -1,5 +1,4 @@
 import Group from "../models/Groups.model.js";
-import Message from "../models/message.model.js";
 import UserGroup from "../models/usergroups.model.js";
 import GroupMessage from "../models/groupMessage.model.js";
 import { getReceiverId, io, userSocketMap } from "../soket/socket.js";
@@ -144,7 +143,7 @@ const getUserGroups = async (req, res) => {
     return res.status(200).json({usergroup});
   } catch (error) {
     console.log(error);
-    res.status(501).json({ error: "Internale Error" });
+    res.status(501).json({ error: "Internal Error" });
   }
 };
 

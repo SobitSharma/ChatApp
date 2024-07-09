@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUserContext } from '../Context/UserContext';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { usegroupContext } from '../Context/GroupContext';
 
 function AddNewUsers() {
   const { sideBarUsers , userLogin} = useUserContext();
@@ -9,6 +10,7 @@ function AddNewUsers() {
   const location = useLocation()
   const {groupId, participants} = location.state || {}
   const navigate = useNavigate()
+  const {updateUserGroupInfo} = usegroupContext()
 
   const alreadyAddedUsers = ()=> {
     if(participants){
@@ -19,6 +21,19 @@ function AddNewUsers() {
       
     }
   }
+
+
+  function updateInformation(){
+    fetch("http://localhost:8000/api/groups/getgroupuser", {
+      method: 'GET',
+      credentials: 'include'
+    }).then((response) => response.json())
+      .then((result) => {
+        updateUserGroupInfo(()=>result.usergroup);  
+      });
+  }
+
+
   useEffect(alreadyAddedUsers, [])
 
   const handleCheckboxChange = (username) => {
@@ -41,6 +56,7 @@ function AddNewUsers() {
       credentials:'include'
     }).then((response)=> {
       if(response.ok){
+        updateInformation();
         alert("The users are added in this group")
       }
     })
