@@ -40,8 +40,6 @@ const sendMessagesInGroup = async (req, res) => {
   try {
     const { groupId, message, sendername ,Participants} = req.body;
     const senderId = req.user?._id;
-    console.log("senderId", senderId)
-    console.log("Partcipnats",Participants)
 
     const onlineUsers = Object.keys(userSocketMap)
     const filteredArry = onlineUsers.filter((single)=> single!==senderId.toString())
@@ -69,9 +67,18 @@ const sendMessagesInGroup = async (req, res) => {
       sendername
     });
 
+    const DataToSend = {
+      senderId,
+      receiverId: groupId,
+      message,
+      type: "text",
+      sendername,
+      createdAt:Date.now()
+    }
+    
     console.log("socketids", socketIds)
     socketIds.forEach((singleId) => {
-      io.to(singleId).emit("groupmessage", userMessage);
+      io.to(singleId).emit("groupmessage", DataToSend);
     });
     
 

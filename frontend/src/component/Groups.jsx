@@ -126,7 +126,6 @@ function Groups() {
       <div className='bg-gray-200 flex flex-col w-1/4 p-4 overflow-y-auto'>
         <div className='bg-gray-100 text-xl text-center p-2 mb-4'>
           <div className='flex flex-row bg-gray-400 justify-between p-2'>
-          <h3 className='bg-white text-black rounded-lg p-2'>Your Groups</h3>
           <button className='bg-white text-black rounded-lg p-2 hover:bg-red-200'
           onClick={()=>navigate('/newgroup')}>Create a New One</button>
           </div>

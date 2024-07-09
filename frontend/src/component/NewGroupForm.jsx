@@ -26,6 +26,7 @@ function NewGroupForm() {
         });
         updateInformation()
         alert("The Group has been Created");
+        navigate("/groups")
       } else {
         response.json().then((result) => alert(result.error));
       }
