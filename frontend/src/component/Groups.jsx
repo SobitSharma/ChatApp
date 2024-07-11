@@ -171,6 +171,12 @@ function Groups() {
               
               }
               <button onClick={()=>navigate('/addusers', {state:{groupId:selectedGroup._id, participants:selectedGroup.participants}})}>Add Participants</button>
+              <img 
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHcVlE9tWBZbgl6lV9i931WKCccCXwuy-CFw&s" 
+              alt="Down" 
+              className='h-8 w-8 rounded-lg bg-red-200' 
+              onClick={()=>scrollToBottom()}
+              />
             </div>
             <div className='flex-grow p-4 overflow-y-auto'>
               {userGroupMessages[selectedGroup._id]?.map((singleMessage, index) => (

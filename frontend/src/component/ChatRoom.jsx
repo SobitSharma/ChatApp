@@ -346,7 +346,7 @@ const ChatRoom = () => {
               />
               <button
                 type="submit"
-                className="ml-4 bg-blue-500 text-white p-2 rounded-full"
+                className="ml-4 bg-blue-500 text-white p-2 rounded-full" 
               >
                 Send
               </button>
@@ -373,7 +373,12 @@ const ChatRoom = () => {
         </button>
       </div>
     </div>
+
   );
 };
 
 export default ChatRoom;
+
+
+
+
