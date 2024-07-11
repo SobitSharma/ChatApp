@@ -3,7 +3,7 @@ import {usegroupContext } from '../Context/GroupContext';
 import { useUserContext } from '../Context/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { useSocketContext } from '../Context/SocketContext';
-
+import GroupImages from './GroupImages';
 
 function Groups() {
   const { userGroupInfo, updateUserGroupInfo , userGroupMessages, updateuserGroupMessages, appendGroupMessages} = usegroupContext();
@@ -14,11 +14,12 @@ function Groups() {
   const {newIncomingMessage} = useSocketContext();  
   const newMessageRef = useRef(null)  
   const [showparticipantsFlag, setshowparticipantsFlag] = useState(false)
+  const [messageSentFlag, setmessageSentFlag]= useState(false)
 
   useEffect(()=>{
     if(!(isEmpty(newIncomingMessage)) && !(userGroupMessages[newIncomingMessage.receiverId]?.includes(newIncomingMessage))){
       appendGroupMessages(newIncomingMessage.receiverId, newIncomingMessage)   
-      scrollToBottom(); 
+      setmessageSentFlag((prev)=>!prev)
     }
     
   }, [newIncomingMessage])
@@ -84,7 +85,8 @@ function Groups() {
       sendername:UserInfo.fullname,
       createdAt:Date.now()
     }
-
+    appendGroupMessages(selectedGroup._id, createNewMessage)
+    setmessageSentFlag((prev)=>!prev)
     const groupId = selectedGroup?._id;
     const Participants = []
     selectedGroup.participants?.map((singlepart)=> {Participants.push(singlepart._id)})
@@ -93,12 +95,12 @@ function Groups() {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ groupId, message: newMessage, sendername:UserInfo.fullname, Participants}),
+      body: JSON.stringify({ groupId, message:newMessage, sendername:UserInfo.fullname, Participants}),
       credentials: 'include'
     }).then((response)=> {
       if(response.ok){
-        appendGroupMessages(selectedGroup._id, createNewMessage)
-        scrollToBottom();
+        // appendGroupMessages(selectedGroup._id, createNewMessage)
+        console.log("Message Sent")
       }
       else{
         alert("Server Crashed Try again After Some Time")
@@ -113,14 +115,14 @@ function Groups() {
 
   useEffect(()=> {
     scrollToBottom();
-  }, [selectedGroup])
+  }, [selectedGroup, appendGroupMessages])
 
   return (
     userLogin?
     <div>
       <button 
       className='bg-blue-400 p-6 rounded w-full hover:bg-slate-500' 
-      onClick={()=> navigate("/room")}
+      onClick={()=> navigate("/room")}  
       >Back</button>
     <div className='flex flex-row bg-gray-100 h-screen'>
       <div className='bg-gray-200 flex flex-col w-1/4 p-4 overflow-y-auto'>
@@ -168,13 +170,17 @@ function Groups() {
               </div>
               
               }
-              {/* <button className='' onClick={HandleParticipants}>Partcipants</button> */}
               <button onClick={()=>navigate('/addusers', {state:{groupId:selectedGroup._id, participants:selectedGroup.participants}})}>Add Participants</button>
             </div>
             <div className='flex-grow p-4 overflow-y-auto'>
               {userGroupMessages[selectedGroup._id]?.map((singleMessage, index) => (
-                <div key={index} className='p-2 bg-white mb-2 rounded shadow'>
-                  {singleMessage.message}
+                <div key={index} className={`p-2 bg-white mb-2 rounded shadow ${singleMessage.shouldshake? "shake": ""}`}>
+                  {singleMessage.type === "text" ? singleMessage.message
+                  :
+                  <div className='bg-gray-300'>
+                    <img src={singleMessage.message} alt="" className=''/>
+                  </div>
+                  }
                   <p className="text-xs text-gray-600">
                     {convertDataAndTime(singleMessage.createdAt)} 
                   </p>
@@ -186,6 +192,7 @@ function Groups() {
               ))}
             <div ref={newMessageRef}/>
             </div >
+            <GroupImages groupId={selectedGroup._id} fullname={UserInfo?.fullname}/>
             <form onSubmit={messagesInGroup} className="flex items-center p-4 border-t bg-gray-100">
               <input
                 value={newMessage}

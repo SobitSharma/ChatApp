@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useUserContext } from "./UserContext";
 import io from "socket.io-client";
-import { usegroupContext } from "./GroupContext";
+import notificationsound from "../assets/sounds/notification.mp3";
 
 export const SocketContext = createContext();
 
@@ -13,7 +13,6 @@ export const SocketContextProvider = ({ children }) => {
   const [socket, setsocket] = useState(null);
   const [onlineusers, setonlineusers] = useState([]);
   const { userLogin, UserInfo } = useUserContext();
-  const {appendGroupMessages} = usegroupContext()
   const [newIncomingMessage, setnewIncomingMessage] = useState({})
 
   useEffect(() => {
@@ -28,8 +27,14 @@ export const SocketContextProvider = ({ children }) => {
         setonlineusers(users)
       })
       socket.on("groupmessage", (message)=> {
-        console.log(message)
+        const sound = new Audio(notificationsound);
+        sound.play();
+        message.shouldshake = true
         setnewIncomingMessage(message)
+      })
+
+      socket.on("reload", (message)=> {
+        console.log(message)
       })
 
       return () => socket.close();

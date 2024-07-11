@@ -170,7 +170,7 @@ const ChatRoom = () => {
               className="rounded-xl bg-gray-400 h-12 w-12 ml-6 hover:cursor-pointer"
               onClick={()=>navigate("/profile")} 
             />
-            <h2 className="text-xl font-semibold">Contacts</h2>
+            <button className="text-xl font-semibold" onClick={()=>navigate("/status")}>Contacts</button>
             <img
               src="https://cdn1.iconfinder.com/data/icons/heroicons-ui/24/logout-512.png"
               alt="Logout"

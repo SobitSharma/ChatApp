@@ -11,6 +11,7 @@ import ProfileDashboard from './component/ProfileDashboard.jsx'
 import Groups from './component/Groups.jsx'
 import NewGroupForm from './component/NewGroupForm.jsx'
 import AddNewUsers from './component/AddNewUsers.jsx'
+import UserStatus from './component/UserStatus.jsx'
 
 
 const router = createBrowserRouter(
@@ -24,6 +25,7 @@ const router = createBrowserRouter(
       <Route path='/groups' element={<Groups/>}></Route>
       <Route path='/newgroup' element={<NewGroupForm/>}></Route>
       <Route path='/addusers' element={<AddNewUsers/>}></Route>
+      <Route path='/status' element={<UserStatus/>}></Route>
     </Route>
   )
 )
