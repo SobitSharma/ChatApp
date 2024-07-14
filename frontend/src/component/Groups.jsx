@@ -115,7 +115,7 @@ function Groups() {
 
   useEffect(()=> {
     scrollToBottom();
-  }, [selectedGroup, appendGroupMessages])
+  }, [selectedGroup, appendGroupMessages])   
 
   return (
     userLogin?
@@ -151,7 +151,7 @@ function Groups() {
             <div className='bg-gray-100 p-4 text-lg font-semibold border-b flex flex-row justify-around'>
               <div> {selectedGroup.groupname} </div>
               {
-                !showparticipantsFlag ? <button className='' onClick={HandleParticipants}>Partcipants</button> 
+                !showparticipantsFlag ? <button className='bg-gray-400 rounded-lg p-3' onClick={HandleParticipants}>Participants</button> 
                 :
                 <div className='bg-gray-200 p-4 rounded-lg shadow-md'>
                 <button
@@ -170,7 +170,8 @@ function Groups() {
               </div>
               
               }
-              <button onClick={()=>navigate('/addusers', {state:{groupId:selectedGroup._id, participants:selectedGroup.participants}})}>Add Participants</button>
+              <button className='bg-gray-400 rounded-lg p-3'
+              onClick={()=>navigate('/addusers', {state:{groupId:selectedGroup._id, participants:selectedGroup.participants}})}>Add Participants</button>
               <img 
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTHcVlE9tWBZbgl6lV9i931WKCccCXwuy-CFw&s" 
               alt="Down" 
@@ -180,7 +181,7 @@ function Groups() {
             </div>
             <div className='flex-grow p-4 overflow-y-auto'>
               {userGroupMessages[selectedGroup._id]?.map((singleMessage, index) => (
-                <div key={index} className={`p-2 bg-white mb-2 rounded shadow ${singleMessage.shouldshake? "shake": ""}`}>
+                <div key={index} className={`p-2 mb-2 rounded shadow ${singleMessage.shouldshake? "shake": ""} ${singleMessage.senderId==UserInfo._id ? "bg-green-200" : "bg-white"}`}>
                   {singleMessage.type === "text" ? singleMessage.message
                   :
                   <div className='bg-gray-300'>

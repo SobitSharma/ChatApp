@@ -33,7 +33,6 @@ function AddNewUsers() {
       });
   }
 
-
   useEffect(alreadyAddedUsers, [])
 
   const handleCheckboxChange = (username) => {
@@ -58,6 +57,7 @@ function AddNewUsers() {
       if(response.ok){
         updateInformation();
         alert("The users are added in this group")
+        navigate("/groups")
       }
     })
   };

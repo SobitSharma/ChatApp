@@ -9,6 +9,7 @@ import cors from "cors"
 import { app, server } from "./soket/socket.js";
 import { updaterouter } from "./routes/updateDetails.js";
 import grouprouter from "./routes/group.routes.js";
+import { statusRouter } from "./routes/status.routes.js";
 dotenv.config()
 
 app.use(express.json()); 
@@ -22,6 +23,7 @@ app.use("/api/messages", router)
 app.use("/api/users",userrouter)
 app.use("/api/updates",updaterouter)
 app.use("/api/groups", grouprouter)
+app.use("/api/status", statusRouter)
 
 connectToMongoDB().then((response)=> {
     if(!response){

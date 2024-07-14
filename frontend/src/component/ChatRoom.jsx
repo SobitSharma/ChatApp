@@ -18,39 +18,39 @@ const ChatRoom = () => {
 
   useEffect(() => {
     if (selectUser) {
-      if(previousmessages?.[selectUser.fullname]){
-        setloading(true)
-        return
-      }  
+      if (previousmessages?.[selectUser.fullname]) {
+        setloading(true);
+        return;
+      }
       fetch(`http://localhost:8000/api/messages/${selectUser._id}`, {
         method: "GET",
         credentials: "include",
       })
         .then((response) => {
-          if(response.ok){
-            return response.json()
+          if (response.ok) {
+            return response.json();
           }
-          response.json().then((result)=>{
-            alert("Your Session has expired Please Login Again")
-            return navigate("/login")
-          } )
+          response.json().then((result) => {
+            alert("Your Session has expired Please Login Again");
+            return navigate("/login");
+          });
         })
         .then((result) => {
-          setpreviousmessages((previous)=>{
-            return {...previous, [selectUser.fullname]:result}
+          setpreviousmessages((previous) => {
+            return { ...previous, [selectUser.fullname]: result };
           });
         });
     }
   }, [selectUser]);
 
-  useEffect(()=> {
+  useEffect(() => {
     setloading(true);
-  }, [previousmessages])
+  }, [previousmessages]);
 
   useEffect(() => {
     if (socket) {
       socket.on("newMessage", (newMessage) => {
-        console.log(newMessage)
+        console.log(newMessage);
         newMessage.shouldshake = true;
         const sound = new Audio(notificationsound);
         sound.play();
@@ -83,10 +83,10 @@ const ChatRoom = () => {
       const messageData = {
         message: newMessage,
         senderId: UserInfo._id,
-        updatedAt:new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         receiverId: selectUser._id,
-        _id: Date.now().toString(), 
-        type:"text"  
+        _id: Date.now().toString(),
+        type: "text",
       };
       setpreviousmessages((previous) => {
         const userMessages = previous[selectUser.fullname] || [];
@@ -117,7 +117,7 @@ const ChatRoom = () => {
   };
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "instant"});
+    messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   };
   useEffect(() => {
     scrollToBottom();
@@ -140,37 +140,43 @@ const ChatRoom = () => {
     });
   }
 
-  useEffect(()=>{scrollToBottom()}, [selectUser])
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectUser]);
 
-  function convertDataAndTime(isoString){
+  function convertDataAndTime(isoString) {
     const date = new Date(isoString);
-  
-    let hours = date.getHours();  
+
+    let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, "0");
     const seconds = date.getSeconds().toString().padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";
-  
+
     hours = hours % 12;
-    hours = hours ? hours : 12;  
+    hours = hours ? hours : 12;
     const formattedHours = hours.toString().padStart(2, "0");
-  
+
     const formattedTime = `${formattedHours}:${minutes} ${ampm}`;
     return formattedTime;
   }
 
   return userLogin ? (
     <div className="flex h-screen bg-gray-100">
-      
       <div className="flex flex-col w-1/4 bg-gray-200 border-r">
         <div className="flex flex-col items-center p-4 border-b bg-white">
           <div className="flex flex-row items-center w-full justify-between">
-          <img
+            <img
               src={UserInfo.profilePic}
               alt="Logout"
               className="rounded-xl bg-gray-400 h-12 w-12 ml-6 hover:cursor-pointer"
-              onClick={()=>navigate("/profile")} 
+              onClick={() => navigate("/profile")}
             />
-            <button className="text-xl font-semibold" onClick={()=>navigate("/status")}>Contacts</button>
+            <button
+              className="text-xl font-semibold hover:text-green-500"
+              onClick={() => navigate("/status")}
+            >
+             My Status
+            </button>
             <img
               src="https://cdn1.iconfinder.com/data/icons/heroicons-ui/24/logout-512.png"
               alt="Logout"
@@ -179,52 +185,54 @@ const ChatRoom = () => {
             />
           </div>
           <div>
-            <button 
-            className="bg-green-200 p-2 rounded-xl hover:bg-green-400"
-            onClick={()=>navigate('/groups')}
-            >Check Your Groups</button>
+            <button
+              className="bg-green-200 p-2 rounded-xl hover:bg-green-400"
+              onClick={() => navigate("/groups")}
+            >
+              Check Your Groups
+            </button>
           </div>
         </div>
         <div className="overflow-y-auto flex-grow p-4 bg-gray-100">
-  {sideBarUsers?.map((user) => (
-    <div
-      className={`flex flex-col sm:flex-row items-center p-4 mb-2 rounded-lg cursor-pointer transition duration-300 ease-in-out transform hover:bg-gray-200 ${
-        selectUser && selectUser._id === user._id ? "bg-gray-300" : ""
-      }`}
-      key={user._id}
-      onClick={() => {
-        setSelectUser((previous) => {
-          if (previous !== user) {
-            setloading(true);
-            return user;
-          } else {
-            return previous;
-          }
-        });
-      }}
-    >
-      <img
-        src={user.profilePic}
-        alt=""
-        className="rounded-full h-12 w-12 object-cover"
-      />
-      <div className="ml-4 mt-2 sm:mt-0 flex-grow text-center sm:text-left">
-        <div className="text-lg font-semibold text-gray-800">{user.username}</div>
-        <div
-          className={`text-sm ${
-            onlineusers.includes(user._id)
-              ? "text-green-500"
-              : "text-red-500"
-          }`}
-        >
-          {onlineusers.includes(user._id) ? "Online" : "Offline"}
+          {sideBarUsers?.map((user) => (
+            <div
+              className={`flex flex-col sm:flex-row items-center p-4 mb-2 rounded-lg cursor-pointer transition duration-300 ease-in-out transform hover:bg-gray-200 ${
+                selectUser && selectUser._id === user._id ? "bg-gray-300" : ""
+              }`}
+              key={user._id}
+              onClick={() => {
+                setSelectUser((previous) => {
+                  if (previous !== user) {
+                    setloading(true);
+                    return user;
+                  } else {
+                    return previous;
+                  }
+                });
+              }}
+            >
+              <img
+                src={user.profilePic}
+                alt=""
+                className="rounded-full h-12 w-12 object-cover"
+              />
+              <div className="ml-4 mt-2 sm:mt-0 flex-grow text-center sm:text-left">
+                <div className="text-lg font-semibold text-gray-800">
+                  {user.username}
+                </div>
+                <div
+                  className={`text-sm ${
+                    onlineusers.includes(user._id)
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
+                  {onlineusers.includes(user._id) ? "Online" : "Offline"}
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
-      </div>
-    </div>
-  ))}
-</div>
-
-
       </div>
       <div className="flex flex-col w-3/4 bg-white">
         {selectUser ? (
@@ -268,22 +276,21 @@ const ChatRoom = () => {
                           className={`bg-gray-300 p-4 rounded-lg max-w-xs${
                             message.shouldshake ? " shake" : ""
                           }`}
-                        >  
-                        {
-                          message.type=="text"?
-                          <p
-                            className="mb-1"
-                            style={{
-                              wordBreak: "break-word",
-                              whiteSpace: "pre-wrap",
-                              maxWidth: "100%",   
-                            }}
-                          >
-                            {message.message} 
-                          </p>
-                          : <img src={message.message} alt="" />
-
-                        }
+                        >
+                          {message.type == "text" ? (
+                            <p
+                              className="mb-1"
+                              style={{
+                                wordBreak: "break-word",
+                                whiteSpace: "pre-wrap",
+                                maxWidth: "100%",
+                              }}
+                            >
+                              {message.message}
+                            </p>
+                          ) : (
+                            <img src={message.message} alt="" />
+                          )}
                           <p className="text-xs text-gray-600">
                             {convertDataAndTime(message.updatedAt)}
                           </p>
@@ -299,21 +306,20 @@ const ChatRoom = () => {
                             message.shouldshake ? " shake" : ""
                           }`}
                         >
-                            {
-                          message.type=="text"?
-                          <p
-                            className="mb-1"
-                            style={{
-                              wordBreak: "break-word",
-                              whiteSpace: "pre-wrap",
-                              maxWidth: "100%", 
-                            }}
-                          >
-                            {message.message}
-                          </p>
-                          : <img src={message.message} alt="" />
-
-                        }
+                          {message.type == "text" ? (
+                            <p
+                              className="mb-1"
+                              style={{
+                                wordBreak: "break-word",
+                                whiteSpace: "pre-wrap",
+                                maxWidth: "100%",
+                              }}
+                            >
+                              {message.message}
+                            </p>
+                          ) : (
+                            <img src={message.message} alt="" />
+                          )}
                           <p className="text-xs text-white">
                             {convertDataAndTime(message.updatedAt)}
                           </p>
@@ -333,7 +339,11 @@ const ChatRoom = () => {
               </ul>
             </div>
 
-            <SendImages selectUser={selectUser} senderId={UserInfo._id} setpreviousmessages={setpreviousmessages}/>
+            <SendImages
+              selectUser={selectUser}
+              senderId={UserInfo._id}
+              setpreviousmessages={setpreviousmessages}
+            />
             <form
               onSubmit={HandleSendMessages}
               className="flex items-center p-4 border-t bg-gray-100"
@@ -346,7 +356,7 @@ const ChatRoom = () => {
               />
               <button
                 type="submit"
-                className="ml-4 bg-blue-500 text-white p-2 rounded-full" 
+                className="ml-4 bg-blue-500 text-white p-2 rounded-full"
               >
                 Send
               </button>
@@ -360,7 +370,7 @@ const ChatRoom = () => {
           </div>
         )}
       </div>
-      </div>
+    </div>
   ) : (
     <div className="flex items-center justify-center h-screen bg-gray-200">
       <div className="text-center">
@@ -373,12 +383,7 @@ const ChatRoom = () => {
         </button>
       </div>
     </div>
-
   );
 };
 
 export default ChatRoom;
-
-
-
-
